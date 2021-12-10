@@ -1,13 +1,24 @@
 import NextAuth from 'next-auth'
 import SpotifyProvider from 'next-auth/providers/spotify'
-import { LOGIN_URL } from '@utils/spotify'
+import spotifyApi, { LOGIN_URL } from '@utils/spotify'
+
+const refreshAccessToken = async (token) => {
+  try {
+    spotifyApi.setAccessToken
+  } catch (error) {
+    return {
+      ...token,
+      error: 'RefreshAccessTokenError',
+    }
+  }
+}
 
 export default NextAuth({
   // Configure one or more authentication providers
   providers: [
     SpotifyProvider({
-      clientId: process.env.GITHUB_ID,
-      clientSecret: process.env.GITHUB_SECRET,
+      clientId: process.env.NEXT_PUBLIC_CLIENT_ID,
+      clientSecret: process.env.NEXT_PUBLIC_CLIENT_SECRET,
       authorization: LOGIN_URL,
     }),
     // ...add more providers here
@@ -29,6 +40,8 @@ export default NextAuth({
       if (Date.now() < token.accessTokenExpires) {
         return token
       }
+
+      return await refreshAccessToken(token)
     },
   },
 })
